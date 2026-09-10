@@ -1,6 +1,8 @@
 # Assignment 02 — the coding agent we actually use
 
-This is not a configuration written for the assignment. It is the one we work in every day: the `.claude/` directory of our SPFx delivery template, the thing that turns Claude Code into a SharePoint Framework developer who already knows our conventions. It is copied here as-is, plus the one layer it was missing — MCP servers.
+This is not a configuration written for the assignment. It is the one we work in every day: the `.claude/` directory of our SPFx delivery template, the thing that turns Claude Code into a SharePoint Framework developer who already knows our conventions.
+
+It is copied here almost untouched. 37 of the 40 files are byte-identical to the ones in the live repository; the only additions are the layer it was missing — MCP servers — which is `.mcp.json` plus three paragraphs, one in `CLAUDE.md` and one each in the two skills that now reach for a server instead of guessing.
 
 No plugins. No marketplace. Everything is a plain file in this folder.
 
@@ -28,11 +30,11 @@ So it is split by when it is needed:
 - **`skills/`** — one per situation, loaded when that situation comes up. `CLAUDE.md` ends with a router table mapping situation to skill.
 - **`agents/`** — the two questions worth their own context window rather than yours.
 
-The whole thing is about 250 KB on disk and a few kilobytes in context at rest.
+The whole thing is about 250 KB on disk, of which roughly 31 KB is in context at rest: `CLAUDE.md`, the four always-loaded rules, and the twenty skill descriptions that let Claude decide which skill to open. The six path-scoped rules and every skill body — the other 200 KB — load only when something actually needs them.
 
 ## Skills
 
-Twenty, and the interesting thing is that they are a lifecycle rather than a toolbox. `CLAUDE.md` makes stages 1–5 mandatory for any prompt that ends in an `Edit` or `Write`, and each stage names the skills that carry it.
+Twenty, and the interesting thing is that they are a lifecycle rather than a toolbox. `CLAUDE.md` makes stages 1–5 mandatory for any prompt that ends in an `Edit` or `Write`, and names the skill that drives each one. Grouped by the stage they serve:
 
 | Stage | Skills |
 |---|---|
@@ -47,7 +49,7 @@ Twenty, and the interesting thing is that they are a lifecycle rather than a too
 
 ## Subagents
 
-Both read-only, both report and never change anything, and both exist because the answer needs to read a lot of files to produce a short verdict — exactly what a separate context window is for.
+Both exist because the answer needs to read a great many files to produce a short verdict — exactly what a separate context window is for. Both are report-only: they say so in their own first line, they never edit source, and removing a dependency or deleting a file is left as a decision for the developer. `bundle-auditor` does run a production build, because it cannot measure a bundle that does not exist yet.
 
 | Agent | Model | Question |
 |---|---|---|
