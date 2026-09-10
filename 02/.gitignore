@@ -1,0 +1,3 @@
+# Approving the project MCP servers writes local state here. It is per-machine,
+# not part of the shared configuration.
+.claude/settings.local.json

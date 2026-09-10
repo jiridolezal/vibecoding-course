@@ -1,0 +1,77 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+
+  "permissions": {
+    "allow": [
+      "Read", "Glob", "Grep", "Edit", "Write", "Skill", "Agent", "TodoWrite",
+      "Artifact", "mcp__claude-in-chrome",
+      "Bash(npm run:*)", "Bash(npm ci)", "Bash(npm install)", "Bash(npm outdated)",
+      "Bash(npm ls:*)",
+      "Bash(npx tsc:*)", "Bash(npx eslint:*)", "Bash(npx prettier:*)",
+      "Bash(npx stylelint:*)",
+      "Bash(npx gulp:*)", "Bash(gulp:*)", "Bash(npx heft:*)", "Bash(heft:*)",
+      "Bash(node scripts/set-version.js:*)",
+      "Bash(node scripts/init-template.js:*)",
+      "Bash(git init:*)",
+      "Bash(git status:*)", "Bash(git diff:*)", "Bash(git log:*)",
+      "Bash(git branch:*)", "Bash(git checkout -b:*)", "Bash(git switch:*)",
+      "Bash(git add:*)", "Bash(git commit:*)", "Bash(git merge:*)",
+      "Bash(git push:*)", "Bash(git fetch:*)", "Bash(git pull --ff-only:*)",
+      "Bash(git remote -v)",
+      "Bash(node --version)", "Bash(npm --version)"
+    ],
+    "ask": [
+      "Bash(npm publish:*)", "Bash(git tag:*)"
+    ],
+    "deny": [
+      "Read(./**/.env)", "Read(./**/.env.*)", "Read(./**/*.pem)",
+      "Read(./**/*.key)", "Read(~/.ssh/**)", "Read(./**/.npmrc)",
+      "Bash(rm -rf /)", "Bash(rm -rf /*)", "Bash(rm -rf ~)", "Bash(sudo rm -rf:*)",
+      "Bash(git branch -D:*)", "Bash(git reset --hard:*)",
+      "Bash(git push --force:*)", "Bash(git push -f:*)",
+      "Bash(git push --force-with-lease:*)", "Bash(git push --delete main)",
+      "Bash(git push origin --delete main)"
+    ]
+  },
+
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/guard-version.js\"",
+            "timeout": 5,
+            "statusMessage": "Checking version fields..."
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/format-on-write.js\"",
+            "timeout": 15,
+            "statusMessage": "Formatting..."
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/verify-gate.js\"",
+            "timeout": 300,
+            "statusMessage": "Verify gate: tsc and eslint..."
+          }
+        ]
+      }
+    ]
+  }
+}
